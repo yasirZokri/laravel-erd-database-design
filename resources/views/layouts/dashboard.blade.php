@@ -41,13 +41,13 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('get.admin.edit') }}">
+                            <a class="nav-link" href="{{ route('admins.manage') }}">
                                 Admins
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('get.users') }}">
+                            <a class="nav-link" href="{{ route('users.manage') }}">
                                 Users
                             </a>
                         </li>

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Attendance extends Model
 {
     protected $table = 'attendances';
-    protected $primaryKey = 'attendance_id';
+    protected $primaryKey = 'id';
 
     protected $fillable = [
         'user_id',

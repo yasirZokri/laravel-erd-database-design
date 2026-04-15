@@ -6,14 +6,82 @@ use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\RegistrationRequest;
+use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
 
-    public function Index()
+    public function index()
     {
-        $users = User::select('id','name','email')->get();
+        $users = User::query()
+            ->select('id', 'name', 'email', 'created_at')
+            ->latest('created_at')
+            ->take(20)
+            ->get();
 
-        return view('auth.usersEdit', compact('users'));
+        return view('users.index', compact('users'));
+    }
+
+    public function create()
+    {
+        return view('users.create');
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8'],
+        ]);
+
+        User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return back()->with('success', 'User created successfully.');
+    }
+
+    public function manage()
+    {
+        $users = User::query()
+            ->select('id', 'name', 'email', 'created_at')
+            ->latest('created_at')
+            ->get();
+
+        return view('users.manage', compact('users'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = User::query()->findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'password' => ['nullable', 'string', 'min:8'],
+        ]);
+
+        $payload = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ];
+        if (!empty($validated['password'])) {
+            $payload['password'] = Hash::make($validated['password']);
+        }
+
+        $user->update($payload);
+
+        return back()->with('success', 'User updated successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $user = User::query()->findOrFail($id);
+        $user->delete();
+
+        return back()->with('success', 'User deleted successfully.');
     }
 
     public function GetUserUpdate($id)
@@ -75,6 +143,5 @@ class UserController extends Controller
     {
         return User::where('name', $name)->get();
     }
-
 
 }
