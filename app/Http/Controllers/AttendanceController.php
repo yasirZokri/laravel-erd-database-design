@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AttendanceRequest;
+use App\Models\ActivityLog;
 use App\Models\Attendance;
 use App\Models\Status;
 use App\Models\User;
 use Dom\Attr;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AttendanceController extends Controller
 {
@@ -21,6 +23,12 @@ class AttendanceController extends Controller
                 'details' => $request->details[$userId] ?? null,
             ]);
         }
+
+        ActivityLog::create([
+            'admin_id' => Auth::guard('admin')->id(),
+            'action' => 'attendance.saved',
+            'description' => 'Saved attendance for ' . count($request->attendance) . ' users.',
+        ]);
 
         return redirect()->route('dashboard')->with('success', 'Attendance saved successfully 🌱');
     }

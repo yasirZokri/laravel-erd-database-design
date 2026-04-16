@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Admin;
+use App\Models\ActivityLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\RegistrationRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
@@ -34,10 +36,17 @@ class UserController extends Controller
             'password' => ['required', 'string', 'min:8'],
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+        ]);
+
+        ActivityLog::create([
+            'admin_id' => Auth::guard('admin')->id(),
+            'user_id' => $user->id,
+            'action' => 'user.created',
+            'description' => 'Created user: ' . $user->email,
         ]);
 
         return back()->with('success', 'User created successfully.');
@@ -73,13 +82,27 @@ class UserController extends Controller
 
         $user->update($payload);
 
+        ActivityLog::create([
+            'admin_id' => Auth::guard('admin')->id(),
+            'user_id' => $user->id,
+            'action' => 'user.updated',
+            'description' => 'Updated user: ' . $user->email,
+        ]);
+
         return back()->with('success', 'User updated successfully.');
     }
 
     public function destroy($id)
     {
         $user = User::query()->findOrFail($id);
+        $email = $user->email;
         $user->delete();
+
+        ActivityLog::create([
+            'admin_id' => Auth::guard('admin')->id(),
+            'action' => 'user.deleted',
+            'description' => 'Deleted user: ' . $email,
+        ]);
 
         return back()->with('success', 'User deleted successfully.');
     }

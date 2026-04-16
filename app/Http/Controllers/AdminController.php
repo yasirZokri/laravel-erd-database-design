@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Hash;
+use App\Models\ActivityLog;
 use App\Models\Admin;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\LoginRequest;
@@ -82,10 +83,16 @@ class AdminController extends Controller
             'isActive' => ['nullable', 'boolean'],
         ]);
 
-        Admin::create([
+        $admin = Admin::create([
             'admin_email' => $validated['admin_email'],
             'admin_password' => Hash::make($validated['admin_password']),
             'isActive' => (bool) ($validated['isActive'] ?? false),
+        ]);
+
+        ActivityLog::create([
+            'admin_id' => Auth::guard('admin')->id(),
+            'action' => 'admin.created',
+            'description' => 'Created admin: ' . $admin->admin_email,
         ]);
 
         return back()->with('success', 'Admin created successfully.');
@@ -127,13 +134,26 @@ class AdminController extends Controller
 
         $admin->update($payload);
 
+        ActivityLog::create([
+            'admin_id' => Auth::guard('admin')->id(),
+            'action' => 'admin.updated',
+            'description' => 'Updated admin: ' . $admin->admin_email,
+        ]);
+
         return back()->with('success', 'Admin updated successfully.');
     }
 
     public function destroy($id)
     {
         $admin = Admin::query()->where('admin_id', $id)->firstOrFail();
+        $email = $admin->admin_email;
         $admin->delete();
+
+        ActivityLog::create([
+            'admin_id' => Auth::guard('admin')->id(),
+            'action' => 'admin.deleted',
+            'description' => 'Deleted admin: ' . $email,
+        ]);
 
         return back()->with('success', 'Admin deleted successfully.');
     }

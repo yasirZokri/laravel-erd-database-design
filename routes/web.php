@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -47,6 +49,12 @@ Route::middleware(['web','auth.admin'])->group(function () {
     Route::get('/admins/manage', [AdminController::class, 'manage'])->name('admins.manage');
     Route::put('/admins/{id}', [AdminController::class, 'update'])->name('admins.update');
     Route::delete('/admins/{id}', [AdminController::class, 'destroy'])->name('admins.destroy');
+
+    // Activity logs & reports
+    Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity_logs.index');
+
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
 
     // Backward-compatible alias for old sidebar links (deprecated)
     Route::get('/edit-Admins', fn () => redirect()->route('admins.manage'))->name('get.admin.edit');

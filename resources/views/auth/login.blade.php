@@ -4,30 +4,24 @@
 
 @section('content')
 
-    <h4 class="text-center mb-4">Admin Login</h4>
-
     @if ($errors->any())
-        <div class="alert alert-danger">
-            {{ $errors->first() }}
-        </div>
+        <div class="flash error">{{ $errors->first() }}</div>
     @endif
 
-    <form method="POST" action="{{ route('admin.login') }}">
+    <form method="POST" action="{{ route('admin.login') }}" class="form">
         @csrf
 
-
-
-        <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" name="admin_email" class="form-control" required autofocus>
+        <div class="field">
+            <label for="admin_email">Email</label>
+            <input id="admin_email" type="email" name="admin_email" required autofocus>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Password</label>
-            <input type="password" name="admin_password" class="form-control" required>
+        <div class="field">
+            <label for="admin_password">Password</label>
+            <input id="admin_password" type="password" name="admin_password" required>
         </div>
 
-        <button type="submit" class="btn btn-primary w-100">
-            Login
-        </button>
+        <div style="display:flex; justify-content:flex-end; margin-top: 14px;">
+            <button type="submit" class="btn btn-primary">Login</button>
+        </div>
 @endsection

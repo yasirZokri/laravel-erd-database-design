@@ -3,34 +3,6 @@
 @section('title', 'Manage Admins')
 @section('page_title', 'Admins / Manage')
 
-@section('styles')
-    <style>
-        .edit-row{
-            background: rgba(15, 23, 42, .02);
-        }
-        .inline-form{
-            display:grid;
-            grid-template-columns: 1fr 1fr 220px;
-            gap: 10px;
-            align-items:end;
-        }
-        @media (max-width: 980px){
-            .inline-form{ grid-template-columns: 1fr; }
-        }
-        .checkbox-row{
-            display:flex;
-            align-items:center;
-            gap: 10px;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: #fff;
-        }
-        .checkbox-row input{ width: 18px; height: 18px; }
-        .small-muted{ font-size: 12px; color: var(--muted); }
-    </style>
-@endsection
-
 @section('content')
     <div class="grid">
         <div class="card">
@@ -80,7 +52,7 @@
                                             @csrf
                                             @method('PUT')
 
-                                            <div class="inline-form">
+                                            <div class="inline-form inline-form--admin">
                                                 <div class="field" style="margin:0;">
                                                     <label for="admin_email-{{ $a->admin_id }}">Email</label>
                                                     <input id="admin_email-{{ $a->admin_id }}" name="admin_email" type="email" value="{{ old('admin_email', $a->admin_email) }}" required>

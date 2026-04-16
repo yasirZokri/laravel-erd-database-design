@@ -9,6 +9,6 @@ class Status extends Model
     public $timestamps = false;
     public function attendance()
     {
-        return $this->belongsTo(Attendance::class);
+        return $this->hasMany(Attendance::class, 'status_id', 'id');
     }
 }

@@ -3,21 +3,6 @@
 @section('title', 'Create Admin')
 @section('page_title', 'Admins / Create')
 
-@section('styles')
-    <style>
-        .checkbox-row{
-            display:flex;
-            align-items:center;
-            gap: 10px;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: #fff;
-        }
-        .checkbox-row input{ width: 18px; height: 18px; }
-    </style>
-@endsection
-
 @section('content')
     <div class="card">
         <div class="card-header">

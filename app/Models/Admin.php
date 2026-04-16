@@ -27,4 +27,9 @@ class Admin extends Authenticatable
     {
         return $this->admin_password;
     }
+
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class, 'admin_id', 'admin_id');
+    }
 }

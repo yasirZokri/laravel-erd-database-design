@@ -1,234 +1,138 @@
 @extends('layouts.app')
 
-@section('title', 'dashboard')
+@section('title', 'Dashboard')
+@section('page_title', 'Dashboard')
 
 @section('content')
-<style>
-   .dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 20px;
-  padding: 20px;
-}
-
-.box {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-}
-
-/* Small cards */
-.box-1 { grid-column: span 3; }
-.box-2 { grid-column: span 3; }
-.box-3 { grid-column: span 3; }
-.box-4 { grid-column: span 3; }
-
-/* Charts */
-.chart-large {
-  grid-column: span 8;
-  height: 300px;
-}
-
-.chart-small {
-  grid-column: span 4;
-  height: 300px;
-}
-
-/* Status */
-.status-box {
-  grid-column: span 4;
-  height: 300px;
-}
-
-/* Table */
-.table-box {
-  grid-column: span 8;
-}
-
-/* Responsive */
-@media (max-width: 992px) {
-  .box-1, .box-2, .box-3, .box-4 {
-    grid-column: span 6;
-  }
-
-  .chart-large,
-  .chart-small,
-  .status-box,
-  .table-box {
-    grid-column: span 12;
-  }
-}
-</style>
-    <div class="container-fluid mt-4">
-
-        {{-- ====== KPI CARDS ====== --}}
-        <div class="row g-4 mb-4">
-
-            <div class="col-xl-3 col-md-6">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body">
-                        <small class="text-muted">Total Users</small>
-                        <h2 class="fw-bold mt-2">{{ number_format($totalUsers ?? 0) }}</h2>
-                        <span class="text-muted">{{ number_format($newUsersThisMonth ?? 0) }} new this month</span>
-                    </div>
+    <div class="grid">
+        <div class="kpi-grid">
+            <div class="card">
+                <div class="card-body">
+                    <div class="kpi-label">Total Users</div>
+                    <div class="kpi-value">{{ number_format($totalUsers ?? 0) }}</div>
+                    <div class="kpi-sub">{{ number_format($newUsersThisMonth ?? 0) }} new this month</div>
                 </div>
             </div>
 
-            <div class="col-xl-3 col-md-6">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body">
-                        <small class="text-muted">Attendance Today</small>
-                        <h2 class="fw-bold mt-2">{{ (int) ($attendanceRateToday ?? 0) }}%</h2>
-                        <span class="text-muted">{{ number_format($attendanceUsersToday ?? 0) }} users marked</span>
-                    </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="kpi-label">Attendance Today</div>
+                    <div class="kpi-value">{{ (int) ($attendanceRateToday ?? 0) }}%</div>
+                    <div class="kpi-sub">{{ number_format($attendanceUsersToday ?? 0) }} users marked</div>
                 </div>
             </div>
 
-            <div class="col-xl-3 col-md-6">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body">
-                        <small class="text-muted">Admins</small>
-                        <h2 class="fw-bold mt-2">{{ number_format($totalAdmins ?? 0) }}</h2>
-                        <span class="text-muted">{{ number_format($activeAdmins ?? 0) }} active</span>
-                    </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="kpi-label">Admins</div>
+                    <div class="kpi-value">{{ number_format($totalAdmins ?? 0) }}</div>
+                    <div class="kpi-sub">{{ number_format($activeAdmins ?? 0) }} active</div>
                 </div>
             </div>
 
-            <div class="col-xl-3 col-md-6">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body">
-                        <small class="text-muted">System</small>
-                        <h2 class="fw-bold mt-2">OK</h2>
-                        <span class="text-muted">Last updated: <span id="dash-last-updated">—</span></span>
-                    </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="kpi-label">System</div>
+                    <div class="kpi-value">OK</div>
+                    <div class="kpi-sub">Last updated: <span id="dash-last-updated">—</span></div>
                 </div>
             </div>
-
         </div>
 
-        {{-- ====== ANALYTICS SECTION ====== --}}
-        <div class="row g-4 mb-4">
-
-            {{-- System Overview --}}
-            <div class="col-lg-8">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-header bg-white fw-bold">
-                        System Overview
+        <div class="dash-grid">
+            <div class="card">
+                <div class="card-header">
+                    <div style="font-weight:700;">System Overview</div>
+                    <div class="muted" style="font-size:13px;">Live charts</div>
+                </div>
+                <div class="card-body">
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap: 10px; margin-bottom: 8px;">
+                        <div style="font-weight:600;">User registrations (last 30 days)</div>
+                        <div class="muted" style="font-size:12px;" id="reg-loading">Loading…</div>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <div class="fw-semibold">User registrations (last 30 days)</div>
-                                    <div class="text-muted small" id="reg-loading">Loading…</div>
-                                </div>
-                                <div style="height: 260px;">
-                                    <canvas id="chart-registrations"></canvas>
-                                </div>
-                            </div>
+                    <div style="height: 260px;">
+                        <canvas id="chart-registrations"></canvas>
+                    </div>
 
-                            <div class="col-12">
-                                <hr class="my-3">
-                            </div>
+                    <div style="height: 1px; background: var(--border); margin: 14px 0;"></div>
 
-                            <div class="col-12">
-                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <div class="fw-semibold">Attendance coverage (last 14 days)</div>
-                                    <div class="text-muted small" id="att-loading">Loading…</div>
-                                </div>
-                                <div style="height: 260px;">
-                                    <canvas id="chart-attendance"></canvas>
-                                </div>
-                            </div>
-                        </div>
-
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap: 10px; margin-bottom: 8px;">
+                        <div style="font-weight:600;">Attendance coverage (last 14 days)</div>
+                        <div class="muted" style="font-size:12px;" id="att-loading">Loading…</div>
+                    </div>
+                    <div style="height: 260px;">
+                        <canvas id="chart-attendance"></canvas>
                     </div>
                 </div>
             </div>
 
-            {{-- Status --}}
-            <div class="col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-header bg-white fw-bold">
-                        System Status
+            <div class="card">
+                <div class="card-header">
+                    <div style="font-weight:700;">System Status</div>
+                </div>
+                <div class="card-body">
+                    <ul class="list">
+                        <li>
+                            <span>Database</span>
+                            <span class="badge success">Online</span>
+                        </li>
+                        <li>
+                            <span>Auth System</span>
+                            <span class="badge success">Running</span>
+                        </li>
+                        <li>
+                            <span>Attendance Today</span>
+                            <span class="badge primary">{{ (int) ($attendanceRateToday ?? 0) }}%</span>
+                        </li>
+                    </ul>
+
+                    <div style="height: 1px; background: var(--border); margin: 14px 0;"></div>
+
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap: 10px; margin-bottom: 8px;">
+                        <div style="font-weight:600;">Today status breakdown</div>
+                        <div class="muted" style="font-size:12px;" id="status-loading">Loading…</div>
                     </div>
-                    <div class="card-body">
-
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between">
-                                Database
-                                <span class="badge bg-success">Online</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between">
-                                Auth System
-                                <span class="badge bg-success">Running</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between">
-                                Attendance Today
-                                <span class="badge bg-primary">{{ (int) ($attendanceRateToday ?? 0) }}%</span>
-                            </li>
-                        </ul>
-
-                        <hr>
-
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <div class="fw-semibold">Today status breakdown</div>
-                            <div class="text-muted small" id="status-loading">Loading…</div>
-                        </div>
-                        <div style="height: 240px;">
-                            <canvas id="chart-status-today"></canvas>
-                        </div>
-
+                    <div style="height: 240px;">
+                        <canvas id="chart-status-today"></canvas>
                     </div>
                 </div>
             </div>
-
         </div>
 
-        {{-- ====== RECENT USERS TABLE ====== --}}
-        <div class="row g-4">
-
-            <div class="col-12">
-                <div class="card shadow-sm border-0">
-                    <div class="card-header bg-white fw-bold">
-                        Recent Users
-                    </div>
-
-                    <div class="card-body p-0">
-                        <table class="table table-striped mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Created</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse(($recentUsers ?? []) as $u)
-                                    <tr>
-                                        <td>{{ $u->id }}</td>
-                                        <td class="fw-semibold">{{ $u->name }}</td>
-                                        <td>{{ $u->email }}</td>
-                                        <td class="text-muted">{{ optional($u->created_at)->format('Y-m-d H:i') }}</td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="4" class="text-center text-muted py-4">
-                                            No users found.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div>
+        <div class="card">
+            <div class="card-header">
+                <div style="font-weight:700;">Recent Users</div>
+                <a class="btn" href="{{ route('users.manage') }}">Manage Users</a>
             </div>
-
+            <div class="card-body" style="padding:0;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:90px;">ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th style="width:180px;">Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse(($recentUsers ?? []) as $u)
+                            <tr>
+                                <td>{{ $u->id }}</td>
+                                <td style="font-weight:600;">{{ $u->name }}</td>
+                                <td>{{ $u->email }}</td>
+                                <td class="muted">{{ optional($u->created_at)->format('Y-m-d H:i') }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="muted" style="text-align:center; padding: 18px;">
+                                    No users found.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
-
     </div>
 
 @endsection
